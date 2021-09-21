@@ -11,26 +11,26 @@ class Field {
     createField() {
         let rows = [];
 
-        for (let i = 0; i < this.rowsNum; i++) {
-            let tr = document.createElement('tr');
-            rows[i] = [];
+        for (let i = 0; i < this.rowsNum; i++) { // проходит по рядам
+            let tr = document.createElement('tr'); // создать необходимое кол-во tr
+            rows[i] = []; // create arr for each line
 
-            for (let j = 0; j < this.colsNum; j++) {
-                let td = document.createElement('td');
-                tr.appendChild(td);
+            for (let j = 0; j < this.colsNum; j++) { // проходит через колонки
+                let td = document.createElement('td'); // создать необходимое количество td
+                tr.appendChild(td); // добавляет td в tr
 
                 //td.addEventListener('click', this.cellClackHandler);
-                rows[i][j] = td;
+                rows[i][j] = td; // добавляет в arr столбцы
             }
-            this.field.appendChild(tr);
+            this.field.appendChild(tr); // добавляет tr в table
         }
         return rows;
     }
 
     getColumns(arr) {
         let result = [];
-        for (let i = 0; i < arr.length; i++) {
-            for (let j = 0; j < arr[i].length; j++) {
+        for (let i = 0; i < arr.length; i++) { // number arr elems - 3
+            for (let j = 0; j < arr[i].length; j++) { // number in arr arrs elems - 3 = 9
                 if (result[j] === undefined) {
                     result[j] = [];
                 }
@@ -39,6 +39,15 @@ class Field {
         }
 
         return result;
+        /*
+            i = [ [], [], [] ] - 3 массива
+            j = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] - элементы выбраного массива - 1, 4, 7 ...
+            [
+                [1, 4, 9],
+                [2, 5, 8],
+                [3, 6, 9]
+            ]
+        */
     }
 
     getFirstDiags(arr) {
@@ -51,6 +60,28 @@ class Field {
                 result[i + j].push(arr[i][j]);
             }
         }
+        /*
+            0 + 0 = 0[1];
+            0 + 1 = 1[4];
+            0 + 2 = 2[7];
+
+            1 + 0 = 1[2];
+            1 + 1 = 2[5];
+            1 + 2 = 3[8];
+
+            2 + 0 = 2[3];
+            2 + 1 = 3[6];
+            2 + 2 = 4[9];
+
+            [
+                [1],
+                [4, 2],
+                [7, 5, 3],
+                [8, 6],
+                [9]
+            ]
+        */
+
         return result
     }
 
@@ -107,14 +138,23 @@ class Game {
         this.choicePlayer(this.gamer, this.lines)
     }
 
+    getRandNumber1() {
+        return Math.floor(Math.random() * 9);
+    }
+
+    getRandNumber2() {
+        return Math.floor(Math.random() * 3);
+
+    }
+
     choicePlayer(gamer, lines) {
-        let random = Math.floor(Math.random() * 9);
+        let ran1 = this.getRandNumber1();
+        let ran2 = this.getRandNumber2();
 
         for (let i = 0; i < lines.length; i++) {
             for (let j = 0; j < lines[i].length; j++) {
-                console.log(lines[i][j].classList.contains('bot'));
                 if (lines[i][j].classList.contains(gamer) === false) {
-                    lines[random][random].classList.add(gamer)
+                    lines[ran1][ran2].classList.add(gamer);
                 } else {
                     lines[i][j].addEventListener('click', function () {
                         this.classList.add(gamer);
@@ -122,7 +162,6 @@ class Game {
                 }
             }
         }
-
     }
 }
 
