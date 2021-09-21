@@ -1,0 +1,41 @@
+body {
+  margin: 20px;
+  font-family: 'Permanent Marker', cursive;
+}
+
+td {
+  width: 80px;
+  height: 80px;
+  border: 1px solid rgba(162, 199, 194, 0.97);
+  border-radius: 50%;
+}
+
+td.gamer1 {
+  font-size: 40px;
+  background-color: #00c43e;
+  text-align: center;
+  transition: 50ms;
+}
+
+td.gamer1:after {
+  content: 'X';
+  color: white;
+  transition: 80ms;
+}
+
+td.gamer2 {
+  font-size: 40px;
+  background-color: deepskyblue;
+  text-align: center;
+  transition: 50ms;
+}
+
+td.gamer2:after {
+  content: 'O';
+  color: white;
+  transition: 80ms;
+}
+
+td.winner {
+  border: 4px solid rgba(199, 2, 0, 0.97);
+}
