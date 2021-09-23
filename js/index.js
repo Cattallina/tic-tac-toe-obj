@@ -4,8 +4,6 @@ class Field {
         this.rowsNum = rowsNum;
         this.colsNum = colsNum;
         this.count = 0;
-
-        this.createField()
     }
 
     createField() {
@@ -107,7 +105,7 @@ class Player {
     constructor(gamers) {
         this.gamers = gamers;
         this.length = this.gamers.length;
-        this.counter = 1;
+        this.counter = 0;
     }
 
     getCount() {
@@ -126,6 +124,7 @@ class Player {
 class Game {
     constructor() {
         const field = new Field('.field', 3, 3);
+        this.count = 0;
 
         this.rows = field.createField(field.field, field.rowsNum, field.colsNum);
         this.cols = field.getColumns(this.rows);
@@ -133,35 +132,102 @@ class Game {
         this.diag2 = field.getSecondDiags(this.rows);
         this.lines = this.rows.concat(this.cols, this.diag1, this.diag2);
 
-        this.player = new Player(['gamer1', 'bot']);
+        this.gamers = ['bot', 'gamer1'];
+        this.player = new Player(['bot', 'gamer1']);
         this.gamer = this.player.getGamer();
-        this.choicePlayer(this.gamer, this.lines)
+        this.run()
     }
 
     getRandNumber1() {
-        return Math.floor(Math.random() * 9);
+        return Math.floor(Math.random() * 3);
     }
 
     getRandNumber2() {
         return Math.floor(Math.random() * 3);
-
     }
 
-    choicePlayer(gamer, lines) {
+    choicePlayer(count, gamer, lines, player, isWin, checkWin, endGame, freezeField, clearField) {
         let ran1 = this.getRandNumber1();
         let ran2 = this.getRandNumber2();
 
         for (let i = 0; i < lines.length; i++) {
             for (let j = 0; j < lines[i].length; j++) {
-                if (lines[i][j].classList.contains(gamer) === false) {
-                    lines[ran1][ran2].classList.add(gamer);
-                } else {
+                if (!(lines[i][j].classList.contains(gamer))) {
                     lines[i][j].addEventListener('click', function () {
                         this.classList.add(gamer);
+                        isWin(count, (player.gamers), lines, checkWin, endGame, freezeField, clearField);
+                        if (!(lines[ran1][ran2].classList.contains(gamer))) {
+                            setTimeout(() => {
+                                let bot = player.getGamer();
+                                lines[ran1][ran2].classList.add(bot);
+                            }, 1000);
+                        }
                     });
                 }
             }
         }
+    }
+
+    run() {
+        this.choicePlayer(this.count, this.gamer, this.lines, this.player, this.isWin, this.checkWin, this.endGame, this.freezeField, this.clearField);
+    }
+
+    checkWin(gamer, lines) {
+        for (let i = 0; i < lines.length; i++) {
+            for (let j = 2; j < lines[i].length; j++) {
+                if (lines[i][j - 2].classList.contains(gamer) &&
+                    lines[i][j - 1].classList.contains(gamer) &&
+                    lines[i][j].classList.contains(gamer)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    isWin(count, gamers, lines, checkWin, endGame, freezeField, clearField) {
+        if (count >= 8) {
+            let quest = confirm('Try again?');
+            if (quest === true) {
+                clearField();
+            } else {
+                return true
+            }
+        }
+
+        for (let i = 0; i < gamers.length; i++) {
+            if (checkWin(gamers[i], lines)) {
+                for (let i = 0; i < lines.length; i++) {
+                    for (let j = 0; j < lines[i].length; j++) {
+                        if (lines[i][j].classList.contains(gamers)) {
+                            lines[i][j].classList.add('winner');
+                        }
+                    }
+                }
+                endGame(gamers[i], freezeField, clearField);
+                break;
+
+            }
+        }
+    }
+
+    endGame(gamer, freezeField, clearField) {
+        setTimeout(() => alert(gamer), 500);
+        freezeField(gamer);
+        clearField();
+    }
+
+    freezeField(gamer) {
+        let cells = document.querySelectorAll('td');
+        for (let i = 0; i < cells.length; i++) {
+            cells[i].removeEventListener('click', function () {
+                this.classList.add(gamer);
+            })
+        }
+    }
+
+    clearField() {
+        setTimeout(() => location.reload(), 1000)
     }
 }
 
