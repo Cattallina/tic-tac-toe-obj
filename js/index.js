@@ -9,26 +9,25 @@ class Field {
     createField() {
         let rows = [];
 
-        for (let i = 0; i < this.rowsNum; i++) { // проходит по рядам
-            let tr = document.createElement('tr'); // создать необходимое кол-во tr
-            rows[i] = []; // create arr for each line
+        for (let i = 0; i < this.rowsNum; i++) {
+            let tr = document.createElement('tr');
+            rows[i] = [];
 
-            for (let j = 0; j < this.colsNum; j++) { // проходит через колонки
-                let td = document.createElement('td'); // создать необходимое количество td
-                tr.appendChild(td); // добавляет td в tr
+            for (let j = 0; j < this.colsNum; j++) {
+                let td = document.createElement('td');
+                tr.appendChild(td);
 
-                //td.addEventListener('click', this.cellClackHandler);
-                rows[i][j] = td; // добавляет в arr столбцы
+                rows[i][j] = td;
             }
-            this.field.appendChild(tr); // добавляет tr в table
+            this.field.appendChild(tr);
         }
         return rows;
     }
 
     getColumns(arr) {
         let result = [];
-        for (let i = 0; i < arr.length; i++) { // number arr elems - 3
-            for (let j = 0; j < arr[i].length; j++) { // number in arr arrs elems - 3 = 9
+        for (let i = 0; i < arr.length; i++) {
+            for (let j = 0; j < arr[i].length; j++) {
                 if (result[j] === undefined) {
                     result[j] = [];
                 }
@@ -37,15 +36,6 @@ class Field {
         }
 
         return result;
-        /*
-            i = [ [], [], [] ] - 3 массива
-            j = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] - элементы выбраного массива - 1, 4, 7 ...
-            [
-                [1, 4, 9],
-                [2, 5, 8],
-                [3, 6, 9]
-            ]
-        */
     }
 
     getFirstDiags(arr) {
@@ -58,27 +48,6 @@ class Field {
                 result[i + j].push(arr[i][j]);
             }
         }
-        /*
-            0 + 0 = 0[1];
-            0 + 1 = 1[4];
-            0 + 2 = 2[7];
-
-            1 + 0 = 1[2];
-            1 + 1 = 2[5];
-            1 + 2 = 3[8];
-
-            2 + 0 = 2[3];
-            2 + 1 = 3[6];
-            2 + 2 = 4[9];
-
-            [
-                [1],
-                [4, 2],
-                [7, 5, 3],
-                [8, 6],
-                [9]
-            ]
-        */
 
         return result
     }
@@ -97,6 +66,7 @@ class Field {
                 result[i].push(arr[i][j]);
             }
         }
+
         return result
     }
 }
@@ -132,34 +102,38 @@ class Game {
         this.diag2 = field.getSecondDiags(this.rows);
         this.lines = this.rows.concat(this.cols, this.diag1, this.diag2);
 
-        this.gamers = ['bot', 'gamer1'];
         this.player = new Player(['bot', 'gamer1']);
         this.gamer = this.player.getGamer();
-        this.run()
+        this.run();
     }
 
     getRandNumber1() {
         return Math.floor(Math.random() * 3);
     }
 
-    getRandNumber2() {
-        return Math.floor(Math.random() * 3);
-    }
-
-    choicePlayer(count, gamer, lines, player, isWin, checkWin, endGame, freezeField, clearField) {
-        let ran1 = this.getRandNumber1();
-        let ran2 = this.getRandNumber2();
-
+    choicePlayer(count, gamer, lines, player, isWin, checkWin, endGame, freezeField, clearField, getRandNumber1) {
+        let ran1 = 0;
+        let ran2 = 0;
         for (let i = 0; i < lines.length; i++) {
             for (let j = 0; j < lines[i].length; j++) {
                 if (!(lines[i][j].classList.contains(gamer))) {
                     lines[i][j].addEventListener('click', function () {
                         this.classList.add(gamer);
-                        isWin(count, (player.gamers), lines, checkWin, endGame, freezeField, clearField);
-                        if (!(lines[ran1][ran2].classList.contains(gamer))) {
+
+                        isWin(count, player, lines, checkWin, endGame, freezeField, clearField);
+                        ran1 = getRandNumber1();
+                        ran2 = getRandNumber1();
+                        count++;
+                        if (lines[ran1][ran2].classList.contains(gamer) === false) {
                             setTimeout(() => {
                                 let bot = player.getGamer();
                                 lines[ran1][ran2].classList.add(bot);
+                            }, 2000);
+                        } else {
+                            setTimeout(() => {
+                                let bot = player.getGamer();
+                                lines[ran1][ran2].classList.add(bot);
+
                             }, 1000);
                         }
                     });
@@ -169,7 +143,7 @@ class Game {
     }
 
     run() {
-        this.choicePlayer(this.count, this.gamer, this.lines, this.player, this.isWin, this.checkWin, this.endGame, this.freezeField, this.clearField);
+        this.choicePlayer(this.count, this.gamer, this.lines, this.player, this.isWin, this.checkWin, this.endGame, this.freezeField, this.clearField, this.getRandNumber1);
     }
 
     checkWin(gamer, lines) {
@@ -182,37 +156,37 @@ class Game {
                 }
             }
         }
+
         return false;
     }
 
-    isWin(count, gamers, lines, checkWin, endGame, freezeField, clearField) {
-        if (count >= 8) {
-            let quest = confirm('Try again?');
-            if (quest === true) {
-                clearField();
-            } else {
-                return true
-            }
-        }
-
-        for (let i = 0; i < gamers.length; i++) {
-            if (checkWin(gamers[i], lines)) {
+    isWin(count, gamers, lines, checkWin, endGame, freezeField, clearField, player) {
+        for (let i = 0; i < gamers.gamers.length; i++) {
+            if (checkWin(gamers.gamers[i], lines)) {
                 for (let i = 0; i < lines.length; i++) {
                     for (let j = 0; j < lines[i].length; j++) {
-                        if (lines[i][j].classList.contains(gamers)) {
+                        if (lines[i][j].classList.contains(gamers.gamers[j])) {
                             lines[i][j].classList.add('winner');
                         }
                     }
                 }
-                endGame(gamers[i], freezeField, clearField);
-                break;
-
+                endGame(gamers.gamers[i], freezeField, clearField);
+                setTimeout(() => {
+                    if (count >= 8) {
+                        let quest = confirm('Try again?');
+                        if (quest === true) {
+                            clearField();
+                        } else {
+                            return true
+                        }
+                    }
+                }, 1000);
             }
         }
     }
 
     endGame(gamer, freezeField, clearField) {
-        setTimeout(() => alert(gamer), 500);
+        setTimeout(() => alert(gamer), 800);
         freezeField(gamer);
         clearField();
     }
@@ -220,6 +194,7 @@ class Game {
     freezeField(gamer) {
         let cells = document.querySelectorAll('td');
         for (let i = 0; i < cells.length; i++) {
+
             cells[i].removeEventListener('click', function () {
                 this.classList.add(gamer);
             })
